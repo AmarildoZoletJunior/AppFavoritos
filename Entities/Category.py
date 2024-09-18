@@ -10,7 +10,7 @@ class Category(Base):
     CTid = Column(Integer, primary_key=True, autoincrement=True)
     CTname = Column(String(550), nullable=False)
 
-    # Relationship
+
     favorites = relationship("Favorites", back_populates="category")
 
 

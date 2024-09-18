@@ -1,5 +1,5 @@
 from tkinter.tix import MAX
-from sqlalchemy import VARCHAR, Column, Integer, String, ForeignKey, Text, BLOB, TIMESTAMP
+from sqlalchemy import VARCHAR, Column, DateTime, Integer, String, ForeignKey, Text, BLOB, TIMESTAMP, func
 from sqlalchemy.orm import relationship
 from Database.Base import Base
 
@@ -11,7 +11,7 @@ class Favorites(Base):
     FVusUId = Column(Integer, ForeignKey('Users.USUid'), nullable=False)
     FVctId = Column(Integer, ForeignKey('Category.CTid'), nullable=False)
     FVurlImage = Column(VARCHAR(MAX), nullable=False)
-    FVcreated_at = Column(TIMESTAMP, nullable=False)
+    FVcreated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
 
     user = relationship("Users", back_populates="favorites")
     category = relationship("Category", back_populates="favorites")
