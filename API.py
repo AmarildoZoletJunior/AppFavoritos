@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from Database.DataBase import Database
+from Repositories.CategoryRepository import CategoryRepository
 from Repositories.UserRepository import UserRepository
 
 
@@ -14,13 +15,13 @@ def SignInAccount():
         UserRep = UserRepository(data)
         response,message = UserRep.ValidUser()
         if not response:
-            return jsonify({'error': message}), 400
+            return jsonify({'Erro': message}), 400
         else:
             response = UserRep.FindUser()
-            if len(response) > 0:
+            if len(response) > 0: 
                 return jsonify({'Mensagem': f'Usuário encontrado com sucesso'}), 200
             else:
-                return jsonify({'error': 'Usuário não encontrado'}), 400
+                return jsonify({'Erro': 'Usuário não encontrado'}), 400
     except Exception as e:
         return jsonify({'Erro': f'Ocorreu um erro'}), 500
     
@@ -32,7 +33,7 @@ def RegisterAccount():
         UserRep = UserRepository(data)
         response,message = UserRep.CreateUser()
         if response == 400:
-            return jsonify({'error': message}), 400
+            return jsonify({'Erro': message}), 400
         else:
             return jsonify({'Mensagem': f'Usuário cadastrado com sucesso'}), 200
     except Exception as e:
@@ -46,7 +47,7 @@ def ResetPassword():
         UserRep = UserRepository(data)
         response,message = UserRep.ResetPassword()
         if response == 400:
-            return jsonify({'error': message}), 400
+            return jsonify({'Erro': message}), 400
         else:
             return jsonify({'Mensagem': f'Usuário cadastrado com sucesso'}), 200
     except Exception as e:
@@ -67,17 +68,52 @@ def ResetPassword():
 @app.route("/create/category",methods=['POST'])
 def CreateCategory():
     try:
-        return 200
+        data = request.get_json(force=True)
+        CategoryRep = CategoryRepository(data)
+        response,message = CategoryRep.CreateCategory()
+        if response == 400:
+            return jsonify({'Erro': message}), 400
+        else:
+            return jsonify({'Mensagem': f'Categoria cadastrado com sucesso'}), 200
     except Exception as e:
         return jsonify({'Erro': f'Ocorreu um erro, erro: {e}'}), 500
+    
+    
+@app.route("/update/category",methods=['PUT'])
+def UpdateCategory():
+    try:
+        data = request.get_json(force=True)
+        CategoryRep = CategoryRepository(data)
+        response,message = CategoryRep.UpdateCategory()
+        if response == 400:
+            return jsonify({'Erro': message}), 400
+        else:
+            return jsonify({'Mensagem': f'Categoria alterada com sucesso.'}), 200
+    except Exception as e:
+        return jsonify({'Erro': f'Ocorreu um erro, erro: {e}'}), 500
+    
+    
     
 @app.route("/list/categories",methods=['GET'])
 def ListCategories():
     try:
-        return 200
+        CategoryRep = CategoryRepository('')
+        response,source = CategoryRep.ListAllCategories()
+        if response == 400:
+            return jsonify({'Erro': source}), 400
+        else:
+            return jsonify({'Categorias':source}), 200
     except Exception as e:
         return jsonify({'Erro': f'Ocorreu um erro, erro: {e}'}), 500
-   
+
+
+
+
+
+
+
+
+
 
 
 

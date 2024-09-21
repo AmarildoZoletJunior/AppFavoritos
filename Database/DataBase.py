@@ -70,7 +70,7 @@ class Database:
                 session.rollback()
                 print(f"Erro ao inserir dados: {e}")
                 return None
-    
+            
     def DoUpdate(self, model, filters: dict, update_data: dict):
         if isinstance(self.engine, str):
             return None
@@ -84,4 +84,19 @@ class Database:
             except Exception as e:
                 session.rollback()
                 print(f"Erro ao atualizar dados: {e}")
+                return None
+            
+            
+    def DoDelete(self, model, **filters):
+        if isinstance(self.engine, str):
+            return None
+        with self.Session() as session:
+            try:
+                query = session.query(model).filter_by(**filters)
+                deleted_count = query.delete(synchronize_session=False)
+                session.commit()
+                return deleted_count
+            except Exception as e:
+                session.rollback()
+                print(f"Erro ao deletar dados: {e}")
                 return None

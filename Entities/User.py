@@ -11,3 +11,4 @@ class Users(Base):
     USUcreated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
     
     favorites = relationship("Favorites", back_populates="user")
+    tags = relationship("Tags", back_populates="user")
