@@ -1,6 +1,7 @@
-
 from Database.DataBase import Database
-from Entities import Excerpts, Favorites
+
+from Entities.Excerpts import Excerpts
+from Entities.Favorites import Favorites
 
 
 class ExcerptRepository():
@@ -19,7 +20,7 @@ class ExcerptRepository():
             response = Data.DoSelect(Favorites,FVid=ETfvId)
             if len(response) == 0:
                 return False,'Favorito não encontrado.'
-        return True
+        return True,''
         
     def CreateExcerpt(self):
         ExcerptContent = self.Data.get('ExcerptContent')
@@ -31,7 +32,7 @@ class ExcerptRepository():
         response = Data.DoInsert(Excerpts,ETExcerpts=ExcerptContent,ETfvId=idFavorito)
         if response is None:
             return 400,'Ocorreu um erro ao inserir o registro, tente novamente.'
-        return 200
+        return 200,''
 
     def UpdateExcerpt(self):
         idExcerpt = self.Data.get('idExcerpt')
@@ -46,10 +47,10 @@ class ExcerptRepository():
         response = Data.DoUpdate(Excerpts,{'ETid':idExcerpt},{'ETExcerpts':ExcerptContent})
         if response is None:
             return 400,'Ocorreu um erro ao inserir o registro, tente novamente.'
-        return 200
+        return 200,''
     
     def ListExcerptsOfFavorite(self):
-        idFavorite = self.Data.get('idExcerpt')
+        idFavorite = self.Data.get('idFavorite')
         if not idFavorite:
             return 400,'Não foi encontrado o favorito selecionado.'
         Data = Database()
@@ -58,6 +59,7 @@ class ExcerptRepository():
             return 400,'Não foi encontrado o favorito selecionado.' 
         listExcerpts = Data.DoSelect(Excerpts,ETfvId = idFavorite)
         return 200,listExcerpts
+    
         
         
     def DeleteExcerpt(self):
@@ -71,5 +73,5 @@ class ExcerptRepository():
         response = Data.DoDelete(Excerpts,ETid=idExcerpt)
         if response is None:
             return 400,'Não foi encontrado o registro e não foi possíve deletar.'
-        return 200
+        return 200,''
         

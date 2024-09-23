@@ -5,7 +5,8 @@
 
 
 from Database.DataBase import Database
-from Entities import Category, Favorites
+from Entities.Category import Category
+from Entities.Favorites import Favorites
 from Entities.User import Users
 
 
@@ -31,7 +32,7 @@ class FavoriteRepository():
             response = Data.DoSelect(Category,CTid=CategoryId)
             if len(response) == 0:
                 return False,'Categoria não encontrada.'
-        return True
+        return True,''
         
         
     def CreateFavorite(self):
@@ -46,7 +47,7 @@ class FavoriteRepository():
         response = Data.DoInsert(Favorites,FVurl=UrlContent,FVusUId=UsuId,FVctId=CategoryId,FVurlImage=UrlImage)
         if response is None:
             return 400,'Ocorreu um erro ao inserir o registro, tente novamente.'
-        return 200
+        return 200,''
     
     def DeleteFavorite(self):
         FavoriteId = self.Data.get('favoriteId')
@@ -59,7 +60,7 @@ class FavoriteRepository():
         response = Data.DoDelete(Favorites,FVid=FavoriteId)
         if response is None:
             return 400,'Não foi encontrado o registro e não foi possíve deletar.'
-        return 200
+        return 200,''
         
     def ListAllFavoriteForUser(self):
         UserId = self.Data.get('userId')
@@ -93,5 +94,5 @@ class FavoriteRepository():
         if not response:
             return 400,message
         Data.DoUpdate(Favorites,{'FVid':FavoriteId},{'FVctId':CategoryId,'FVurlImage':UrlImage,'FVurl':UrlContent})
-        return 200
+        return 200,''
     

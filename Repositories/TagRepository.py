@@ -19,7 +19,7 @@ class TagRepository():
             UserExist = Data.DoSelect(Users,USUid=tagIdUser)
             if len(UserExist) == 0:
                 return False,'Usuário não encontrado.'
-        return True
+        return True,''
         
     def CreateTag(self):
         tagName = self.Data.get('tagName')
@@ -28,10 +28,10 @@ class TagRepository():
         if not response:
             return 400,message
         Data = Database()
-        response = Data.DoInsert(Tags,TGname=tagName,)
+        response = Data.DoInsert(Tags,TGname=tagName,TGIdUser=tagIdUser)
         if response is None:
             return 400,'Ocorreu um erro ao inserir o registro, tente novamente.'
-        return 200
+        return 200,''
     
     def UpdateTag(self):
         idTag = self.Data.get('tagId')
@@ -46,7 +46,7 @@ class TagRepository():
         response = Data.DoUpdate(Tags,{'TGid':idTag},{'TGname':tagName})
         if response is None:
             return 400,'Ocorreu um erro ao inserir o registro, tente novamente.'
-        return 200
+        return 200,''
     
     def ListAllTagForUserId(self):
         tagIdUser = self.Data.get('tagIdUser')
@@ -62,10 +62,10 @@ class TagRepository():
     def DeleteTag(self):
         idTag = self.Data.get('tagId')
         Data = Database()
-        tagExist = Data.DoSelect(Users,TGid=idTag)
+        tagExist = Data.DoSelect(Tags,TGid=idTag)
         if len(tagExist) == 0:
             return 400, 'Tag não encontrada.'
         response = Data.DoDelete(Tags,TGid=idTag)
         if response is None:
             return 400,'Tag não encontrada.'
-        return 200
+        return 200,''

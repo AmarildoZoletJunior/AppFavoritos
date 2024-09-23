@@ -35,7 +35,7 @@ class Database:
                 f"DATABASE={configuration.DATABASE};"
                 f"Trusted_Connection=yes;"
             )
-            engine = create_engine(f"mssql+pyodbc:///?odbc_connect={params}", echo=True)
+            engine = create_engine(f"mssql+pyodbc:///?odbc_connect={params}", echo=False)
             with engine.connect() as connection:
                 pass
             return engine

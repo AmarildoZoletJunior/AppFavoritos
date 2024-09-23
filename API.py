@@ -1,5 +1,13 @@
 from flask import Flask, request, jsonify
 from Database.DataBase import Database
+
+
+
+
+from Repositories.FavoriteRepository import FavoriteRepository
+from Repositories.ExcerptRepository import ExcerptRepository
+from Repositories.TagsToFavoriteRepository import TagsToFavorite
+from Repositories.TagRepository import TagRepository
 from Repositories.CategoryRepository import CategoryRepository
 from Repositories.UserRepository import UserRepository
 
@@ -16,14 +24,13 @@ def SignInAccount():
         response,message = UserRep.ValidUser()
         if not response:
             return jsonify({'Erro': message}), 400
+        response = UserRep.FindUser()
+        if response: 
+            return jsonify({'Mensagem': f'Usuário encontrado com sucesso'}), 200
         else:
-            response = UserRep.FindUser()
-            if len(response) > 0: 
-                return jsonify({'Mensagem': f'Usuário encontrado com sucesso'}), 200
-            else:
-                return jsonify({'Erro': 'Usuário não encontrado'}), 400
+            return jsonify({'Erro': 'Usuário não encontrado'}), 400
     except Exception as e:
-        return jsonify({'Erro': f'Ocorreu um erro'}), 500
+        return jsonify({'Erro': f'Ocorreu um erro, erro:{e}'}), 500
     
     
 @app.route("/create/user",methods=['POST'])
@@ -69,8 +76,11 @@ def ResetPassword():
 def CreateCategory():
     try:
         data = request.get_json(force=True)
+        print("aqui api 03")
         CategoryRep = CategoryRepository(data)
+        print("aqui api01")
         response,message = CategoryRep.CreateCategory()
+        print("aqui api02")
         if response == 400:
             return jsonify({'Erro': message}), 400
         else:
@@ -124,29 +134,54 @@ def ListCategories():
 @app.route("/create/tag",methods=['POST'])
 def CreateTag():
     try:
-        return 200
+        data = request.get_json(force=True)
+        tagRep = TagRepository(data)
+        response,message = tagRep.CreateTag()
+        if response == 400:
+            return jsonify({'Erro': message}), 400
+        else:
+            return jsonify({'Mensagem': f'Tag cadastrado com sucesso'}), 200
     except Exception as e:
         return jsonify({'Erro': f'Ocorreu um erro, erro: {e}'}), 500
 
     
-@app.route("/list/tags",methods=['GET'])
-def ListUserTags():
+@app.route("/list/tags/<int:userId>",methods=['GET'])
+def ListUserTags(userId):
     try:
-        return 200
+        data = {"tagIdUser": userId}
+        tagRep = TagRepository(data)
+        response,source = tagRep.ListAllTagForUserId()
+        if response == 400:
+            return jsonify({'Erro': source}), 400
+        else:
+            return jsonify({'Tags':source}), 200
     except Exception as e:
         return jsonify({'Erro': f'Ocorreu um erro, erro: {e}'}), 500
     
 @app.route("/update/tag",methods=['PUT'])
 def UpdateTag():
     try:
-        return 200
+        data = request.get_json(force=True)
+        tagRep = TagRepository(data)
+        response,message = tagRep.UpdateTag()
+        if response == 400:
+            return jsonify({'Erro': message}), 400
+        else:
+            return jsonify({'Mensagem': f'Tag alterada com sucesso.'}), 200
     except Exception as e:
         return jsonify({'Erro': f'Ocorreu um erro, erro: {e}'}), 500
     
-@app.route("/delete/tag",methods=['DELETE'])
-def DeleteTag():
+    
+@app.route("/delete/tag/<int:idTag>",methods=['DELETE'])
+def DeleteTag(idTag):
     try:
-        return 200
+        data = {"tagId": idTag}
+        tagRep = TagRepository(data)
+        response,message = tagRep.DeleteTag()
+        if response == 400:
+            return jsonify({'Erro': message}), 400
+        else:
+            return jsonify({'Mensagem': f'Tag deletada com sucesso'}), 200
     except Exception as e:
         return jsonify({'Erro': f'Ocorreu um erro, erro: {e}'}), 500
     
@@ -161,31 +196,74 @@ def DeleteTag():
 @app.route("/create/favorite",methods=['POST'])
 def CreateFavorite():
     try:
-        return 200
+        data = request.get_json(force=True)
+        favoriteRep = FavoriteRepository(data)
+        response,message = favoriteRep.CreateFavorite()
+        if response == 400:
+            return jsonify({'Erro': message}), 400
+        else:
+            return jsonify({'Mensagem': f'Favorito cadastrado com sucesso'}), 200
     except Exception as e:
         return jsonify({'Erro': f'Ocorreu um erro, erro: {e}'}), 500
     
-@app.route("/list/favorites",methods=['GET'])
-def ListUserFavorites():
+@app.route("/list/favorites/<int:userId>",methods=['GET'])
+def ListUserFavorites(userId):
     try:
-        return 200
+        data = {"userId": userId}
+        favoritesRep = FavoriteRepository(data)
+        response,source = favoritesRep.ListAllFavoriteForUser()
+        if response == 400:
+            return jsonify({'Erro': source}), 400
+        else:
+            return jsonify({'Favoritos':source}), 200
     except Exception as e:
         return jsonify({'Erro': f'Ocorreu um erro, erro: {e}'}), 500
     
     
-@app.route("/delete/favorite",methods=['DELETE'])
-def DeleteFavorite():
+@app.route("/list/favorite/<int:idFavorite>",methods=['GET'])
+def ListUserFavorite(idFavorite):
     try:
-        return 200
+        data = {"favoriteId": idFavorite}
+        favoritesRep = FavoriteRepository(data)
+        response,source = favoritesRep.ListAFavorite()
+        if response == 400:
+            return jsonify({'Erro': source}), 400
+        else:
+            return jsonify({'Favorito':source}), 200
     except Exception as e:
         return jsonify({'Erro': f'Ocorreu um erro, erro: {e}'}), 500
+    
+    
+@app.route("/delete/favorite/<int:idFavorite>",methods=['DELETE'])
+def DeleteFavorite(idFavorite):
+    try:
+        data = {"favoriteId": idFavorite}
+        favoriteRep = FavoriteRepository(data)
+        response,message = favoriteRep.DeleteFavorite()
+        if response == 400:
+            return jsonify({'Erro': message}), 400
+        else:
+            return jsonify({'Mensagem': f'Favorito deletado com sucesso'}), 200
+    except Exception as e:
+        return jsonify({'Erro': f'Ocorreu um erro, erro: {e}'}), 500
+    
+    
 
 @app.route("/update/favorite",methods=['PUT'])
 def UpdateFavorite():
     try:
-        return 200
+        data = request.get_json(force=True)
+        favoriteRep = FavoriteRepository(data)
+        response,message = favoriteRep.UpdateFavorite()
+        if response == 400:
+            return jsonify({'Erro': message}), 400
+        else:
+            return jsonify({'Mensagem': f'Favorito alterada com sucesso.'}), 200
     except Exception as e:
         return jsonify({'Erro': f'Ocorreu um erro, erro: {e}'}), 500
+    
+    
+
     
     
     
@@ -197,28 +275,57 @@ def UpdateFavorite():
 @app.route("/create/excerpt",methods=['POST'])
 def CreateExcerpts():
     try:
-        return 200
+        data = request.get_json(force=True)
+        excerptRep = ExcerptRepository(data)
+        response,message = excerptRep.CreateExcerpt()
+        if response == 400:
+            return jsonify({'Erro': message}), 400
+        else:
+            return jsonify({'Mensagem': f'Comentário cadastrado com sucesso'}), 200
     except Exception as e:
         return jsonify({'Erro': f'Ocorreu um erro, erro: {e}'}), 500
     
-@app.route("/list/FavoritesExcerpts",methods=['GET'])
-def ListFavoritesExcerpts():
+@app.route("/list/ExcerptsFavorite/<int:idFavorite>",methods=['GET'])
+def ListFavoritesExcerpts(idFavorite):
     try:
-        return 200
+        data = {"idFavorite": idFavorite}
+        excerptRep = ExcerptRepository(data)
+        response,source = excerptRep.ListExcerptsOfFavorite()
+        if response == 400:
+            return jsonify({'Erro': source}), 400
+        else:
+            return jsonify({'Favorito':source}), 200
     except Exception as e:
         return jsonify({'Erro': f'Ocorreu um erro, erro: {e}'}), 500
     
-@app.route("/delete/excerpt",methods=['DELETE'])
-def DeleteExcerpts():
+    
+    
+@app.route("/delete/excerpt/<int:idExcerpt>",methods=['DELETE'])
+def DeleteExcerpts(idExcerpt):
     try:
-        return 200
+        data = {"idExcerpt": idExcerpt}
+        excerptRep = ExcerptRepository(data)
+        response,message = excerptRep.DeleteExcerpt()
+        if response == 400:
+            return jsonify({'Erro': message}), 400
+        else:
+            return jsonify({'Mensagem': f'Comentário deletado com sucesso'}), 200
     except Exception as e:
         return jsonify({'Erro': f'Ocorreu um erro, erro: {e}'}), 500
+    
+    
     
     
 @app.route("/update/excerpt",methods=['PUT'])
 def UpdateExcerpts():
     try:
-      return 200
+        data = request.get_json(force=True)
+        excerptRep = ExcerptRepository(data)
+        response,message = excerptRep.UpdateExcerpt()
+        if response == 400:
+            return jsonify({'Erro': message}), 400
+        else:
+            return jsonify({'Mensagem': f'Comentário alterado com sucesso.'}), 200
     except Exception as e:
         return jsonify({'Erro': f'Ocorreu um erro, erro: {e}'}), 500
+    

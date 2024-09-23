@@ -43,6 +43,9 @@ class UserRepository():
         if not response:
             return 400,message
         Data = Database()
+        response = Data.DoSelect(Users,USUsername=self.login)
+        if len(response) > 0:
+            return 400,'Já existe um usuário com este nome'
         response = Data.DoInsert(Users,USUsername=self.login,USUpassword=self.password)
         if response is None:
             return 400,'Ocorreu um erro ao gravar registro, tente novamente.'
@@ -74,7 +77,7 @@ class UserRepository():
         match = re.match(self.pattern, password)
         if not match:
             return False,'Senha não contém os caracteres necessários.'
-        return True
+        return True,''
     
     def ResetPassword(self):
         self.login = self.Data.get('login')
