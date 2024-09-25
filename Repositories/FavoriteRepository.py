@@ -62,6 +62,7 @@ class FavoriteRepository():
             return 400,'Não foi encontrado o registro e não foi possíve deletar.'
         return 200,''
         
+        
     def ListAllFavoriteForUser(self):
         UserId = self.Data.get('userId')
         if not UserId:
@@ -70,15 +71,25 @@ class FavoriteRepository():
         userExist = Data.DoSelect(Users,USUid=UserId)
         if len(userExist) == 0:
             return 400, 'Usuário nao encontrado.'
-        favoritesList = Data.DoSelect(Favorites,FVusUId=UserId)
-        return 200,favoritesList
+        results = Data.DoSelectWithRelations(
+            Favorites, 
+            relations=[Favorites.category, Favorites.user],
+            filters={'FVusUId': UserId}
+        )
+        return 200,results
+    
     
     def ListAFavorite(self):
         FavoriteId = self.Data.get('favoriteId')
         Data = Database()
-        response = Data.DoSelect(Favorites,FVid=FavoriteId)
-        return 200,response
-    
+        response = Data.DoSelectWithRelations(
+            Favorites,
+            relations=[
+                Favorites.category, Favorites.user
+            ],
+            filters={'FVid': FavoriteId}
+        )
+        return 200, response
     
     def UpdateFavorite(self):
         FavoriteId = self.Data.get('favoriteId')

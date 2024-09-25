@@ -14,17 +14,13 @@ class CategoryRepository():
         
     def CreateCategory(self):
         categoryName = self.Data.get('categoryName')
-        print("teste001")
         response,message = self.ValidCategory(categoryName)
-        print("teste002")
         if not response:
             return 400,message
         Data = Database()
-        print("teste01")
         response = Data.DoInsert(Category,CTname=categoryName)
         if response is None:
             return 400,'Ocorreu um erro ao inserir o registro, tente novamente.'
-        print("teste02")
         return 200,''
     
     def UpdateCategory(self):

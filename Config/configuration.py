@@ -9,6 +9,8 @@ try:
     DRIVER = config.get('DRIVER')
     SERVER = config.get('SERVER')
     DATABASE = config.get('DATABASE')
+    config = conf_obj['Parametros']
+    CHAVE = config.get('ChaveJWT')
     
     
     

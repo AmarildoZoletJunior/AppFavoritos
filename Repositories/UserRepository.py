@@ -24,10 +24,7 @@ class UserRepository():
     def FindUser(self):
         Data = Database()
         resultado  = Data.DoSelect(Users,USUsername = self.login,USUpassword = self.password)
-        if len(resultado) > 0:
-            return True
-        else:
-            return False
+        return resultado
         
         
     def FindUsername(self,login):
